@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 
 	"github.com/ninet33n19/XiaoKV/internal/config"
+	"github.com/ninet33n19/XiaoKV/internal/resp"
 )
 
 func main() {
@@ -35,6 +36,15 @@ func main() {
 
 		go handleClient(conn, &concurrent_clients)
 	}
+
+	// buf := []byte(":1000\r\n")
+
+	// val, _, err := resp.Decode(buf)
+	// if err != nil {
+	// 	log.Println(err)
+	// 	return
+	// }
+	// fmt.Println(val)
 }
 
 func handleClient(conn net.Conn, concurrent_clients *int64) {
@@ -53,6 +63,13 @@ func handleClient(conn net.Conn, concurrent_clients *int64) {
 			return
 		}
 
-		log.Println(string(buf[:n]))
+		log.Print(string(buf[:n]))
+
+		val, _, err := resp.Decode(buf)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println(val)
 	}
 }
