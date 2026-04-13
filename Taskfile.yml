@@ -1,0 +1,7 @@
+version: "3"
+
+tasks:
+  run:
+    desc: Run the server
+    cmds:
+      - go run cmd/server/main.go

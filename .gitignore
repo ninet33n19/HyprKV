@@ -1,0 +1,144 @@
+# Binaries for programs and plugins
+/bin/
+/build/
+/dist/
+/out/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test            # test binary produced by `go test -c`
+*.prof
+
+# Output of the go coverage and profiling tools
+coverage.out
+*.coverprofile
+*.cov
+*.pprof
+
+# Dependency management / vendoring
+/vendor/          # Ignore vendored dependencies (remove if you vendor and commit them)
+
+# Go module & cache
+# (Do NOT ignore go.mod or go.sum — they should be committed)
+Gopkg.lock
+Gopkg.toml
+/pkg/             # GOPATH mode output (safe to ignore)
+*.modcache
+*.gomodcache
+
+# Build artifacts created by tools (eg. goreleaser)
+release/
+*.tar.gz
+*.zip
+*.tar
+*.rpm
+
+# Logs, databases, and runtime files
+*.log
+logs/
+*.db
+*.sqlite
+*.sqlite3
+*.pid
+
+# Environment files and secrets
+.env
+.env.*
+.env.local
+*.key
+*.pem
+*.crt
+secrets.yml
+credentials.json
+
+# Editor and IDE files
+# JetBrains (GoLand, IntelliJ)
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim / Emacs / temporary editor files
+*~
+*.swp
+*.swo
+.#*
+*.un~
+# emacs
+*~
+\#*\#
+.\#*
+.emacs.desktop
+
+# macOS files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~.nfs
+
+# Generated files - common patterns
+gen/
+generated/
+*_gen.go
+*.generated.go
+
+# Test result directories
+test-results/
+coverage/
+
+# Containers / orchestration
+docker-compose.override.yml
+docker-compose.*.yml
+.env.docker
+
+# Kubernetes / helm local caches
+.kube/
+helmfile.d/
+helm_cache/
+
+# Node / frontend artifacts (if this repo includes frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.pnp.js
+
+# Caches, temporary files
+.cache/
+tmp/
+temp/
+.build/
+.dist/
+
+# Misc: OS or tooling artefacts
+*.bak
+*.orig
+*.old
+
+# CI artifacts
+artifacts/
+ci-output/
+
+# Ignore local generated binaries named after module or package
+# (Covers common local build outputs)
+*:exe
+*:dll
+*:so
+
+# If you intentionally want to commit any of the above (e.g. vendor/ or .vscode/),
+# remove the corresponding entry from this file.
