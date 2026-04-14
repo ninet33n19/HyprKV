@@ -2,6 +2,7 @@ package resp
 
 import (
 	"errors"
+	"fmt"
 )
 
 func Decode(data []byte) (any, error) {
@@ -114,4 +115,67 @@ func readArray(data []byte) ([]any, int, error) {
 	}
 
 	return items, nextPos, nil
+}
+
+func Encode(val any) ([]byte, error) {
+	switch v := val.(type) {
+	case nil:
+		return encodeNull(), nil
+	case string:
+		return encodeSimpleString(v), nil
+	case []byte:
+		return encodeBulkString(v), nil
+	case int:
+		return encodeInteger(int64(v)), nil
+	case int64:
+		return encodeInteger(v), nil
+	case error:
+		return encodeError(v.Error()), nil
+	case []any:
+		return encodeArray(v)
+	default:
+		return nil, errors.New("unsupported type")
+	}
+}
+
+func encodeNull() []byte {
+	return []byte("$-1\r\n")
+}
+
+func encodeSimpleString(data string) []byte {
+	return fmt.Appendf(nil, "+%s\r\n", data)
+}
+
+func encodeBulkString(data []byte) []byte {
+	length := len(data)
+	result := append(fmt.Appendf(nil, "$%d\r\n", length), data...)
+	result = append(result, "\r\n"...)
+
+	return result
+}
+
+func encodeInteger(n int64) []byte {
+	return fmt.Appendf(nil, ":%d\r\n", n)
+}
+
+func encodeError(message string) []byte {
+	return fmt.Appendf(nil, "-%s\r\n", message)
+}
+
+func encodeArray(items []any) ([]byte, error) {
+	if items == nil {
+		return []byte("*-1\r\n"), nil
+	}
+
+	result := fmt.Appendf(nil, "*%d\r\n", len(items))
+
+	for _, item := range items {
+		encoded, err := Encode(item)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, encoded...)
+	}
+
+	return result, nil
 }
