@@ -14,7 +14,7 @@ func TestSimpleStringDecode(t *testing.T) {
 	}
 
 	for k, v := range cases {
-		value, _, err := resp.Decode([]byte(k))
+		value, err := resp.Decode([]byte(k))
 		if err != nil {
 			t.Errorf("Decode(%s) failed: %v", k, err)
 		}
@@ -31,7 +31,7 @@ func TestError(t *testing.T) {
 	}
 
 	for k, v := range cases {
-		value, _, err := resp.Decode([]byte(k))
+		value, err := resp.Decode([]byte(k))
 		if err != nil {
 			t.Errorf("Decode(%s) failed: %v", k, err)
 		}
@@ -50,7 +50,7 @@ func TestInteger(t *testing.T) {
 	}
 
 	for k, v := range cases {
-		value, _, err := resp.Decode([]byte(k))
+		value, err := resp.Decode([]byte(k))
 		if err != nil {
 			t.Errorf("Decode(%s) failed: %v", k, err)
 		}
@@ -68,7 +68,7 @@ func TestBulk(t *testing.T) {
 	}
 
 	for k, v := range cases {
-		value, _, err := resp.Decode([]byte(k))
+		value, err := resp.Decode([]byte(k))
 		if err != nil {
 			t.Errorf("Decode(%s) failed: %v", k, err)
 		}
@@ -86,7 +86,7 @@ func TestArray(t *testing.T) {
 	}
 
 	for k, v := range cases {
-		value, _, err := resp.Decode([]byte(k))
+		value, err := resp.Decode([]byte(k))
 		if err != nil {
 			t.Errorf("Decode(%s) failed: %v", k, err)
 		}
