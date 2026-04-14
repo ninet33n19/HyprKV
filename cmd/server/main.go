@@ -1,10 +1,13 @@
 package main
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"strconv"
+	"strings"
 	"sync/atomic"
 
 	"github.com/ninet33n19/XiaoKV/internal/config"
@@ -54,13 +57,71 @@ func handleClient(conn net.Conn, concurrent_clients *int64) {
 			return
 		}
 
-		log.Print(string(buf[:n]))
+		payload := buf[:n]
+		log.Print(string(payload))
 
-		val, err := resp.Decode(buf)
+		val, err := resp.Decode(payload)
 		if err != nil {
+			log.Println(err)
+			writeResp(conn, errors.New("ERR parse error"))
+			continue
+		}
+		log.Printf("Received command: %v", val)
+
+		reply, err := dispatchCommand(val)
+		if err != nil {
+			if writeErr := writeResp(conn, err); writeErr != nil {
+				log.Println(writeErr)
+				return
+			}
+			continue
+		}
+
+		if err := writeResp(conn, reply); err != nil {
 			log.Println(err)
 			return
 		}
-		log.Println(val)
 	}
+}
+
+func dispatchCommand(val any) (any, error) {
+	parts, ok := val.([]any)
+	if !ok {
+		return nil, errors.New("ERR expected array command")
+	}
+	if len(parts) == 0 {
+		return nil, errors.New("ERR empty command")
+	}
+
+	cmdRaw, ok := parts[0].([]byte)
+	if !ok {
+		return nil, errors.New("ERR command name must be bulk string")
+	}
+	cmd := strings.ToUpper(string(cmdRaw))
+
+	switch cmd {
+	case "PING":
+		if len(parts) > 1 {
+			msg, ok := parts[1].([]byte)
+			if !ok {
+				return nil, errors.New("ERR ping argument must be bulk string")
+			}
+			return msg, nil
+		}
+		return "PONG", nil
+	case "COMMAND":
+		return []any{}, nil
+	default:
+		return nil, fmt.Errorf("ERR unknown command '%s'", cmd)
+	}
+}
+
+func writeResp(conn net.Conn, val any) error {
+	encoded, err := resp.Encode(val)
+	if err != nil {
+		return err
+	}
+
+	_, err = conn.Write(encoded)
+	return err
 }
