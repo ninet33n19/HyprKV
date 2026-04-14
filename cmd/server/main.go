@@ -36,15 +36,6 @@ func main() {
 
 		go handleClient(conn, &concurrent_clients)
 	}
-
-	// buf := []byte(":1000\r\n")
-
-	// val, _, err := resp.Decode(buf)
-	// if err != nil {
-	// 	log.Println(err)
-	// 	return
-	// }
-	// fmt.Println(val)
 }
 
 func handleClient(conn net.Conn, concurrent_clients *int64) {
@@ -65,7 +56,7 @@ func handleClient(conn net.Conn, concurrent_clients *int64) {
 
 		log.Print(string(buf[:n]))
 
-		val, _, err := resp.Decode(buf)
+		val, err := resp.Decode(buf)
 		if err != nil {
 			log.Println(err)
 			return
