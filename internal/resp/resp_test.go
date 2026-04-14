@@ -82,9 +82,10 @@ func TestRESPDecode(t *testing.T) {
 
 	t.Run("array", func(t *testing.T) {
 		cases := map[string][]any{
-			"*3\r\n:1\r\n:2\r\n:3\r\n":             {int64(1), int64(2), int64(3)},
-			"*0\r\n":                               {},
-			"*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n": {[]byte("hello"), []byte("world")},
+			"*3\r\n:1\r\n:2\r\n:3\r\n":              {int64(1), int64(2), int64(3)},
+			"*0\r\n":                                {},
+			"*2\r\n$5\r\nhello\r\n$5\r\nworld\r\n":  {[]byte("hello"), []byte("world")},
+			"*2\r\n$7\r\nCOMMAND\r\n$4\r\nDOCS\r\n": {[]byte("COMMAND"), []byte("DOCS")},
 		}
 
 		for k, v := range cases {
