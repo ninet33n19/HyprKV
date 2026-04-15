@@ -37,11 +37,11 @@ func main() {
 		atomic.AddInt64(&concurrent_clients, 1)
 		log.Println("Concurrent clients:", concurrent_clients)
 
-		go handleClient(conn, &concurrent_clients)
+		go handleConnection(conn, &concurrent_clients)
 	}
 }
 
-func handleClient(conn net.Conn, concurrent_clients *int64) {
+func handleConnection(conn net.Conn, concurrent_clients *int64) {
 	defer conn.Close()
 	buf := make([]byte, 1024)
 
@@ -57,30 +57,50 @@ func handleClient(conn net.Conn, concurrent_clients *int64) {
 			return
 		}
 
-		payload := buf[:n]
-		log.Print(string(payload))
-
-		val, err := resp.Decode(payload)
+		value, err := resp.Decode(buf[:n])
 		if err != nil {
-			log.Println(err)
-			writeResp(conn, errors.New("ERR parse error"))
+			fmt.Println("Decode error:", err)
 			continue
 		}
-		log.Printf("Received command: %v", val)
 
-		reply, err := dispatchCommand(val)
-		if err != nil {
-			if writeErr := writeResp(conn, err); writeErr != nil {
-				log.Println(writeErr)
-				return
+		response := handleCommand(value)
+
+		encoded, _ := resp.Encode(response)
+		conn.Write(encoded)
+	}
+}
+
+func handleCommand(value any) any {
+	args, ok := value.([]any)
+	if !ok || len(args) == 0 {
+		return errors.New("ERR unknown command")
+	}
+
+	command := strings.ToUpper(string(args[0].([]byte)))
+
+	switch command {
+	case "PING":
+		if len(args) > 1 {
+			msg, ok := args[1].([]byte)
+			if !ok {
+				return errors.New("ERR ping argument must be bulk string")
 			}
-			continue
+			return msg
 		}
-
-		if err := writeResp(conn, reply); err != nil {
-			log.Println(err)
-			return
+		return "PONG"
+	case "ECHO":
+		if len(args) > 1 {
+			msg, ok := args[1].([]byte)
+			if !ok {
+				return errors.New("ERR echo argument must be bulk string")
+			}
+			return msg
 		}
+		return errors.New("ERR echo requires an argument")
+	case "COMMAND":
+		return []any{}
+	default:
+		return fmt.Errorf("ERR unknown command '%s'", command)
 	}
 }
 
