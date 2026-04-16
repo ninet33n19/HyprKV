@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/ninet33n19/XiaoKV/internal/server"
-	"github.com/ninet33n19/XiaoKV/internal/storage"
+	"github.com/ninet33n19/HyprKV/internal/server"
+	"github.com/ninet33n19/HyprKV/internal/storage"
 )
 
 func main() {
