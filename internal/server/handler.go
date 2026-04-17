@@ -44,6 +44,25 @@ func (s *Server) routeCommand(value any) any {
 			return nil // Encode will turn this into the Null Bulk String ($-1\r\n)
 		}
 		return val
+	case "DEL":
+		if len(args) < 2 {
+			return errors.New("ERR wrong number of arguments for 'DEL' command")
+		}
+
+		keys := make([]string, 0, len(args)-1)
+		for _, arg := range args[1:] {
+			key, ok := arg.([]byte)
+			if !ok {
+				return errors.New("ERR DEL arguments must be bulk strings")
+			}
+			keys = append(keys, string(key))
+		}
+
+		deleted, err := s.storage.Delete(keys...)
+		if err != nil {
+			return err
+		}
+		return deleted
 	case "ECHO":
 		if len(args) > 1 {
 			msg, ok := args[1].([]byte)

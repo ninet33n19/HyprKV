@@ -1,22 +1,27 @@
 package server
 
 import (
-	"fmt"
 	"io"
 	"net"
+	"time"
 
 	"github.com/ninet33n19/HyprKV/internal/resp"
 	"github.com/ninet33n19/HyprKV/internal/storage"
+	"github.com/rs/zerolog"
 )
 
 type Server struct {
 	storage *storage.Storage
+	logger  zerolog.Logger
 }
 
-func New(storage *storage.Storage) *Server {
-	return &Server{
+func New(storage *storage.Storage, logger zerolog.Logger) *Server {
+	s := &Server{
 		storage: storage,
+		logger:  logger,
 	}
+	s.storage.StartCleaner(time.Minute)
+	return s
 }
 
 func (s *Server) Start(address string) error {
@@ -26,12 +31,12 @@ func (s *Server) Start(address string) error {
 	}
 	defer l.Close()
 
-	fmt.Println("Server listening on", address)
+	s.logger.Info().Str("address", address).Msg("server listening")
 
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			fmt.Println("Accept error:", err)
+			s.logger.Error().Err(err).Msg("accept failed")
 			continue
 		}
 		go s.handleConnection(conn)
@@ -40,27 +45,29 @@ func (s *Server) Start(address string) error {
 
 func (s *Server) handleConnection(conn net.Conn) {
 	defer conn.Close()
+	logger := s.logger.With().Str("remote_addr", conn.RemoteAddr().String()).Logger()
+	logger.Debug().Msg("connection accepted")
 	buf := make([]byte, 2048) // A larger buffer for commands with payloads
 
 	for {
 		n, err := conn.Read(buf)
 		if err != nil {
 			if err != io.EOF {
-				fmt.Println("Read error:", err)
+				logger.Error().Err(err).Msg("read failed")
 			}
+			logger.Debug().Msg("connection closed")
 			return
 		}
 
-		// Decode using your resp package
 		val, err := resp.Decode(buf[:n])
 		if err != nil {
+			logger.Warn().Err(err).Msg("failed to decode request")
 			continue
 		}
 
-		// Route the command
+		logger.Debug().Int("bytes", n).Msg("request received")
 		response := s.routeCommand(val)
 
-		// Encode and reply
 		encoded, _ := resp.Encode(response)
 		conn.Write(encoded)
 	}
