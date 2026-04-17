@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ninet33n19/XiaoKV/internal/resp"
+	"github.com/ninet33n19/HyprKV/internal/resp"
 )
 
 func TestRESPDecode(t *testing.T) {
