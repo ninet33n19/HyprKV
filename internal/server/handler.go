@@ -16,6 +16,9 @@ func (s *Server) routeCommand(value any) any {
 
 	switch command {
 	case "PING":
+		if len(args) > 2 {
+			return errors.New("ERR wrong number of arguments for 'ping' command")
+		}
 		if len(args) > 1 {
 			msg, ok := args[1].([]byte)
 			if !ok {
