@@ -23,7 +23,7 @@ func (s *Server) Get(w http.ResponseWriter, r *http.Request) {
 
 	value, ok := s.store.Get(key)
 	if !ok {
-		http.Error(w, "key not found", http.StatusInternalServerError)
+		http.Error(w, "key not found", http.StatusNotFound)
 		return
 	}
 
