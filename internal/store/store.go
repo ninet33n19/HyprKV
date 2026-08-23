@@ -6,7 +6,7 @@ import (
 )
 
 type Store struct {
-	mu   sync.Mutex
+	mu   sync.RWMutex
 	data map[string]string
 }
 
@@ -29,8 +29,8 @@ func (s *Store) Set(key, value string) error {
 }
 
 func (s *Store) Get(key string) (string, bool) {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 	value, ok := s.data[key]
 	return value, ok
 }
