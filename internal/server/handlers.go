@@ -29,7 +29,9 @@ func (s *Server) Set(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := io.ReadAll(r.Body)
+	limitedBody := http.MaxBytesReader(w, r.Body, 1<<20)
+
+	body, err := io.ReadAll(limitedBody)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to read body")
 		return

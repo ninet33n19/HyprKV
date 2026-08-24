@@ -1,9 +1,14 @@
 package server
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 )
+
+type errorResponse struct {
+	Error string `json:"error"`
+}
 
 func writeJSON(w http.ResponseWriter, status int, value string) {
 	w.Header().Set("Content-Type", "application/json")
@@ -14,5 +19,7 @@ func writeJSON(w http.ResponseWriter, status int, value string) {
 }
 
 func writeError(w http.ResponseWriter, status int, msg string) {
-	http.Error(w, msg, status)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(errorResponse{Error: msg})
 }

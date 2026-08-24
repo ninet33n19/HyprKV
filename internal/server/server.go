@@ -3,6 +3,7 @@ package server
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/ninet33n19/HyprKV/internal/store"
 )
@@ -29,8 +30,16 @@ func (s *Server) routes() *http.ServeMux {
 }
 
 func (s *Server) ListenAndServe() {
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      s.routes(),
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
 	log.Println("Server listening on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", s.routes()); err != nil {
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 }
