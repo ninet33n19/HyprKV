@@ -1,21 +1,14 @@
 package server
 
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 )
 
 func writeJSON(w http.ResponseWriter, status int, value string) {
-	payload := json.RawMessage(value)
-	if !json.Valid(payload) {
-		writeError(w, http.StatusInternalServerError, "stored value is not valid JSON")
-		return
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	if _, err := w.Write(payload); err != nil {
+	if _, err := w.Write([]byte(value)); err != nil {
 		log.Printf("failed to write response: %v", err)
 	}
 }

@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 )
@@ -35,6 +36,11 @@ func (s *Server) Set(w http.ResponseWriter, r *http.Request) {
 	}
 
 	value := string(body)
+	if !json.Valid(body) {
+		writeError(w, http.StatusBadRequest, "value must be valid JSON")
+		return
+	}
+
 	if err := s.store.Set(key, value); err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to set value")
 		return
