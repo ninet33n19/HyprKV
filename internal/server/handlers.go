@@ -50,3 +50,9 @@ func (s *Server) Set(w http.ResponseWriter, r *http.Request) {
 
 	writeJSON(w, http.StatusOK, value)
 }
+
+func (s *Server) HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+}

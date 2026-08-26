@@ -25,6 +25,7 @@ func (s *Server) routes() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /{key}", s.Get)
 	mux.HandleFunc("POST /set/{key}", s.Set)
+	mux.HandleFunc("GET /healthz", s.HealthCheck)
 
 	return mux
 }
